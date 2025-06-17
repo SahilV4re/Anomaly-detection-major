@@ -1,0 +1,120 @@
+{
+    "audit_policies": [
+      {
+        "policy_name": "Incorrect GST Calculation Policy",
+        "description": "Checks if CGST + SGST does not equal 5% of Sub_Total for local orders, allowing a tolerance of ±1.",
+        "condition": "(Order_Source == 'Local') AND (abs(CGST_Amount + SGST_Amount - (0.05 * Sub_Total)) > 1)",
+        "relevant_columns": ["Order_Source", "CGST_Amount", "SGST_Amount", "Sub_Total"],
+        "severity_range": [0.3, 0.5],
+        "example": {
+          "Invoice_No_": "12345",
+          "Order_Source": "Local",
+          "Sub_Total": 1000,
+          "CGST_Amount": 20,
+          "SGST_Amount": 20,
+          "Expected_GST": 50,
+          "Details": "GST (₹40) does not match expected ₹50 (5% of ₹1000)."
+        },
+        "action": "Flag as 'Incorrect GST Calculation.' Recalculate GST and update records."
+      },
+      {
+        "policy_name": "Invalid Service Charge for Online Order Policy",
+        "description": "Ensures online orders do not have service charges applied.",
+        "condition": "(Is_Online == True) AND (Service_Charge_Amount > 0)",
+        "relevant_columns": ["Is_Online", "Service_Charge_Amount"],
+        "severity_range": [0.3, 0.7],
+        "example": {
+          "Invoice_No_": "67890",
+          "Is_Online": true,
+          "Service_Charge_Amount": 50,
+          "Details": "₹50 service charge applied to an online order."
+        },
+        "action": "Flag as 'Invalid Service Charge for Online Order.' Remove service charge."
+      },
+      {
+        "policy_name": "Tax Applied to Non-Taxable Item Policy",
+        "description": "Detects non-taxable items with any tax (CGST, SGST, or VAT) applied.",
+        "condition": "(Non_Taxable == 1) AND ((CGST_Amount + SGST_Amount + VAT_Amount) > 0)",
+        "relevant_columns": ["Non_Taxable", "CGST_Amount", "SGST_Amount", "VAT_Amount"],
+        "severity_range": [0.3, 0.5],
+        "example": {
+          "Invoice_No_": "54321",
+          "Non_Taxable": 1,
+          "CGST_Amount": 10,
+          "SGST_Amount": 10,
+          "Details": "₹20 tax applied to a non-taxable item."
+        },
+        "action": "Flag as 'Tax Applied to Non-Taxable Item.' Remove tax amounts."
+      },
+      {
+        "policy_name": "Invalid Payment Method for Online Order Policy",
+        "description": "Ensures online orders (e.g., Zomato/Swiggy) use valid payment methods (Online, Zomato Pay, Paytm).",
+        "condition": "(Is_Online == True) AND (Payment_Type NOT IN ['Online', 'Other [ZOMATO PAY]', 'Other [Paytm]'])",
+        "relevant_columns": ["Is_Online", "Payment_Type"],
+        "severity_range": [0.5, 0.7],
+        "example": {
+          "Invoice_No_": "98765",
+          "Is_Online": true,
+          "Payment_Type": "Cash",
+          "Details": "Cash payment used for an online order."
+        },
+        "action": "Flag as 'Invalid Payment Method for Online Order.' Verify payment method."
+      },
+      {
+        "policy_name": "Local Order with Aggregator Data Policy",
+        "description": "Detects local orders with aggregator fields (e.g., Zomato/Swiggy order numbers) populated.",
+        "condition": "(Order_Source == 'Local') AND (Aggregator_Order_No_z IS NOT NULL OR Aggregator_Order_No_s IS NOT NULL)",
+        "relevant_columns": ["Order_Source", "Aggregator_Order_No_z", "Aggregator_Order_No_s"],
+        "severity_range": [0.3, 0.5],
+        "example": {
+          "Invoice_No_": "45678",
+          "Order_Source": "Local",
+          "Aggregator_Order_No_z": "ZOM123",
+          "Details": "Local order contains aggregator order number 'ZOM123'."
+        },
+        "action": "Flag as 'Local Order with Aggregator Data.' Clear aggregator fields or reclassify order."
+      },
+      {
+        "policy_name": "Late Cancellation Policy",
+        "description": "Identifies cancelled orders with high preparation time (>30 minutes).",
+        "condition": "(Status CONTAINS 'Cancelled') AND ((Food_Preparation_Time_Z > 30) OR (Food_Preparation_Time_S > 30))",
+        "relevant_columns": ["Status", "Food_Preparation_Time_Z", "Food_Preparation_Time_S"],
+        "severity_range": [0.5, 0.7],
+        "example": {
+          "Invoice_No_": "11223",
+          "Status": "Cancelled",
+          "Food_Preparation_Time_Z": 45,
+          "Details": "Order cancelled after 45 minutes of preparation."
+        },
+        "action": "Flag as 'Late Cancellation.' Review cancellation reason and process."
+      },
+      {
+        "policy_name": "High-Value Cancellation Policy",
+        "description": "Flags cancelled orders with a total value exceeding ₹1000.",
+        "condition": "(Status CONTAINS 'Cancelled') AND (Cancelled_Invoice_Total_co > 1000)",
+        "relevant_columns": ["Status", "Cancelled_Invoice_Total_co"],
+        "severity_range": [0.7, 1.0],
+        "example": {
+          "Invoice_No_": "14558",
+          "Status": "Cancelled",
+          "Cancelled_Invoice_Total_co": 1240,
+          "Details": "Cancelled order with ₹1240 total value."
+        },
+        "action": "Flag as 'High-Value Cancellation.' Investigate cancellation cause."
+      },
+      {
+        "policy_name": "Unapproved Complimentary Order Policy",
+        "description": "Detects complimentary orders without an assigned approver.",
+        "condition": "(Status == 'Complimentary') AND (Assign_To IS NULL)",
+        "relevant_columns": ["Status", "Assign_To"],
+        "severity_range": [0.5, 0.7],
+        "example": {
+          "Invoice_No_": "33445",
+          "Status": "Complimentary",
+          "Assign_To": null,
+          "Details": "Complimentary order lacks approval assignment."
+        },
+        "action": "Flag as 'Unapproved Complimentary Order.' Assign approver or verify policy."
+      }
+    ]
+  }
