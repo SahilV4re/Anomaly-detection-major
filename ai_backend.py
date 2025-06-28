@@ -17,6 +17,9 @@ import os
 import logging
 import time
 import logging
+from dotenv import load_dotenv
+
+# load_dotenv()
 logger = logging.getLogger(__name__)
 from fastapi.middleware.cors import CORSMiddleware
 try:
@@ -29,8 +32,9 @@ except ImportError as e:
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# api_key1 = os.getenv('GROQ_API_KEY')
 # Initialize Groq client
-client = Groq(api_key="your api key")
+client = Groq(api_key = "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")
 df = None
 model_pipeline = None
 audit_policies = None
@@ -182,7 +186,7 @@ app = FastAPI(lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:3000"],
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
@@ -316,11 +320,11 @@ def run_anomaly_detection(data: pd.DataFrame) -> pd.DataFrame:
     flagged_df = df_local[(df_local['detected_flags'] != "") | (df_local['model_flags'] != "")]
     if len(flagged_df) > 0:
         logger.info("Computing severity scores...")
-        flagged_df['severity_score'] = flagged_df.apply(
+        flagged_df.loc[:, 'severity_score'] = flagged_df.apply(
             lambda row: compute_severity_score(row, [np.mean(p['severity_range']) for p in audit_policies if any(p['policy_name'] in row['detected_flags'] for p in audit_policies)]), 
             axis=1
         )
-        flagged_df['severity'] = pd.cut(
+        flagged_df.loc[:, 'severity'] = pd.cut(
             flagged_df['severity_score'],
             bins=[0, 33, 66, 100],
             labels=['low', 'medium', 'high'],

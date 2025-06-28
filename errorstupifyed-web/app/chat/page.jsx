@@ -42,7 +42,7 @@ export default function ChatPage() {
     setIsTyping(true);
 
     try {
-      const res = await axios.post("http://10.120.135.105:8008/chat", {
+      const res = await axios.post("http://127.0.0.1:8008/chat", {
         message: input,
       });
 

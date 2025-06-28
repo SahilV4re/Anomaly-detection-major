@@ -2,8 +2,8 @@ from flask import Blueprint, request, jsonify
 from app.repositories.user_repo import UserRepository
 
 # MongoDB Credentials
-MONGO_URI = "mongodb+srv://admin:admin@lit-coders.dcuhn.mongodb.net/?retryWrites=true&w=majority&appName=lit-coders"
-DB_NAME = "error_stupifyed"
+MONGO_URI = "mongodb+srv://sahil:sahilsv@mongocluster.zceoy2s.mongodb.net/?retryWrites=true&w=majority&appName=mongocluster"
+DB_NAME = "user_anomaly"
 
 user_bp = Blueprint("user_routes", __name__)
 repo = UserRepository(MONGO_URI, DB_NAME)

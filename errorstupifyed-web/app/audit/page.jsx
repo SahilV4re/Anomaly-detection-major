@@ -15,6 +15,7 @@ import {
     BreadcrumbList,
     BreadcrumbPage,
 } from "@/components/ui/breadcrumb";
+const groq_key = process.env.NEXT_PUBLIC_GROQ_API_KEY;
 
 export default function UploadPage() {
     const [file, setFile] = useState(null);
@@ -125,7 +126,7 @@ export default function UploadPage() {
                     {
                         headers: {
                             "Content-Type": "application/json",
-                            "Authorization": `Bearer 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`
+                            "Authorization": `Bearer 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`
                         },
                         timeout: 30000 // 30 seconds timeout
                     }
