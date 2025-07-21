@@ -36,8 +36,8 @@ export function TeamSwitcher({
                 <TrendingUp className="size-4" />
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">Cognify Sales Analyzer</span>
-                <span className="truncate text-xs">Error Stupifyed</span>
+                <span className="truncate font-medium">Scanalyser</span>
+                <span className="truncate text-xs">Scan-{">"}Detect-{">"}Act</span>
               </div>
              
             </div>

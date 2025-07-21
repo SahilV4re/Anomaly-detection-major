@@ -126,7 +126,7 @@ export default function UploadPage() {
                     {
                         headers: {
                             "Content-Type": "application/json",
-                            "Authorization": `Bearer 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`
+                            "Authorization": `Bearer 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`
                         },
                         timeout: 30000 // 30 seconds timeout
                     }
